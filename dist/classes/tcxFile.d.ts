@@ -61,7 +61,5 @@ export declare class TcxFile extends EventEmitter {
      * @param callback η συνάρτηση που επιστρέφει (err, data). Όπου data σε μορφή iXmlData
      * το σύνολο των δεδομένων του TCX αρχείου (filename)
      */
-    read(filename: string, callback: (err: string, data: iXmlData) => void): void;
     readFromString(source: string, callback: (err: string, data: iXmlData) => void): void;
-    save(filename: string, athleteId: number, zones: [number, number, number, number] | null, callback: (err: string) => void): void;
 }
