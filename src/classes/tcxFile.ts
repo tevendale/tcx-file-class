@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events';
-import * as fs from 'fs';
 import {Author} from "./author";
 import {Creator} from "./creator";
 import * as pstring from 'xml2js';
@@ -31,17 +30,6 @@ export class TcxFile extends EventEmitter {
     //constructor(filename:string, callback:(err:string)=>void){
     constructor() {
         super();
-        // this.read(filename,(err)=>{
-        //     if (err){
-        //         this.isError = err;
-        //         this.emit('endReading',err);
-        //         callback(err);
-        //     }else {
-        //         this.emit('endReading',null)
-        //         this.isReady = true;
-        //         callback(undefined);
-        //     }
-        // });
     }
 
     /**Διαβάζει την ιδότητα Id του ΤCX αρχείου
@@ -140,36 +128,6 @@ export class TcxFile extends EventEmitter {
      * @param callback η συνάρτηση που επιστρέφει (err, data). Όπου data σε μορφή iXmlData 
      * το σύνολο των δεδομένων του TCX αρχείου (filename)
      */
-    read(filename: string, callback: (err: string, data: iXmlData) => void) {
-        let self = this;
-        fs.readFile(filename, 'utf8', (err, data) => {
-            if (!err) {
-                //το αρχείο υπάρχει τότε το string πάει για parsing
-                pString(data, function (err, result) {
-                    if (!err) {
-                        self.data = result;
-                        self.isError = consts.ERROR_STRING_VALUE;
-                        self.isReady = true;
-                        self.emit('endReading', null);
-                        callback(null, result);
-                    } else {
-                        self.isError = err.message;
-                        self.data = null;
-                        self.isReady = false;
-                        self.emit('endReading', err);
-                        callback(err, null);
-                    }
-                });
-            } else {
-                //το αρχείο δεν υπάρχει
-                self.data = null;
-                self.isError = err.message;
-                self.isReady = false;
-                self.emit('endReading', err);
-                callback(err.message, null);
-            }
-        });
-    }
 
 
     readFromString(source: string, callback: (err: string, data: iXmlData) => void) {
@@ -191,26 +149,4 @@ export class TcxFile extends EventEmitter {
         });
     }
 
-    save(filename: string, athleteId: number, zones: [number, number, number, number] | null, callback: (err: string) => void) {
-        let self = this;
-        self.emit('Proccessing', 'starting...');
-        let act = new Activity();
-        act.on('Process', (val) => {
-            self.emit('Process', val);
-        })
-        act.on('progress', (val) => {
-            self.emit('progress', val);
-        })
-        act.read(athleteId, this, zones);
-        self.emit('Proccessing', '...end');
-        fs.writeFile(filename, JSON.stringify(act.proccessElements), (err) => {
-            if (err) {
-                self.emit('endWriting', err);
-                callback(err.message);
-            } else {
-                self.emit('endWriting', null);
-                callback(undefined);
-            }
-        });
-    }
 }
