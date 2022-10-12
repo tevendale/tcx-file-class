@@ -2,3 +2,5 @@ src/spec/*.tcx
 output
 test
 node_modules
+
+.DS_Store
